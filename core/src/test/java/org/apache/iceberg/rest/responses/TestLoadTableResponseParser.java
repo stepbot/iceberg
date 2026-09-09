@@ -63,6 +63,30 @@ public class TestLoadTableResponseParser {
   }
 
   @Test
+  public void roundTripMetadataRevisionWithoutMetadataLocation() {
+    TableMetadata metadata =
+        TableMetadata.newTableMetadata(
+            new Schema(Types.NestedField.required(1, "x", Types.LongType.get())),
+            PartitionSpec.unpartitioned(),
+            SortOrder.unsorted(),
+            "location",
+            Map.of());
+    LoadTableResponse response =
+        LoadTableResponse.builder()
+            .withTableMetadata(metadata)
+            .withMetadataRevision("catalog-revision-17")
+            .build();
+
+    String json = LoadTableResponseParser.toJson(response);
+    LoadTableResponse roundTripped = LoadTableResponseParser.fromJson(json);
+
+    assertThat(json).contains("\"metadata-revision\":\"catalog-revision-17\"");
+    assertThat(json).doesNotContain("metadata-location");
+    assertThat(roundTripped.metadataRevision()).isEqualTo("catalog-revision-17");
+    assertThat(roundTripped.metadataLocation()).isNull();
+  }
+
+  @Test
   public void roundTripSerdeV1() {
     String uuid = "386b9f01-002b-4d8c-b77f-42c3fd3b7c9b";
     TableMetadata metadata =
