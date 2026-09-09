@@ -42,6 +42,7 @@ import org.apache.iceberg.rest.credentials.Credential;
 public class LoadTableResponse implements RESTResponse {
 
   private String metadataLocation;
+  private String metadataRevision;
   private TableMetadata metadata;
   private Map<String, String> config;
   private TableMetadata metadataWithLocation;
@@ -54,11 +55,13 @@ public class LoadTableResponse implements RESTResponse {
 
   private LoadTableResponse(
       String metadataLocation,
+      String metadataRevision,
       TableMetadata metadata,
       Map<String, String> config,
       List<Credential> credentials,
       RemoteSigningConfig remoteSigningConfig) {
     this.metadataLocation = metadataLocation;
+    this.metadataRevision = metadataRevision;
     this.metadata = metadata;
     this.config = config;
     this.credentials = credentials;
@@ -72,6 +75,16 @@ public class LoadTableResponse implements RESTResponse {
 
   public String metadataLocation() {
     return metadataLocation;
+  }
+
+  /**
+   * Returns the opaque revision that identifies the committed table metadata, or null when absent.
+   *
+   * <p>The revision can identify catalog-managed metadata that does not have a metadata file
+   * location. Clients must treat this value as opaque.
+   */
+  public String metadataRevision() {
+    return metadataRevision;
   }
 
   public TableMetadata tableMetadata() {
@@ -99,6 +112,7 @@ public class LoadTableResponse implements RESTResponse {
   public String toString() {
     return MoreObjects.toStringHelper(this)
         .add("metadataLocation", metadataLocation)
+        .add("metadataRevision", metadataRevision)
         .add("metadata", metadata)
         .add("config", config)
         .toString();
@@ -110,6 +124,7 @@ public class LoadTableResponse implements RESTResponse {
 
   public static class Builder {
     private String metadataLocation;
+    private String metadataRevision;
     private TableMetadata metadata;
     private final Map<String, String> config = Maps.newHashMap();
     private final List<Credential> credentials = Lists.newArrayList();
@@ -120,6 +135,11 @@ public class LoadTableResponse implements RESTResponse {
     public Builder withTableMetadata(TableMetadata tableMetadata) {
       this.metadataLocation = tableMetadata.metadataFileLocation();
       this.metadata = tableMetadata;
+      return this;
+    }
+
+    public Builder withMetadataRevision(String revision) {
+      this.metadataRevision = revision;
       return this;
     }
 
@@ -151,7 +171,7 @@ public class LoadTableResponse implements RESTResponse {
     public LoadTableResponse build() {
       Preconditions.checkNotNull(metadata, "Invalid metadata: null");
       return new LoadTableResponse(
-          metadataLocation, metadata, config, credentials, remoteSigningConfig);
+          metadataLocation, metadataRevision, metadata, config, credentials, remoteSigningConfig);
     }
   }
 }

@@ -63,6 +63,7 @@ class RESTTableOperations implements TableOperations {
   private final Set<Endpoint> endpoints;
   private UpdateType updateType;
   private TableMetadata current;
+  private String currentRevision;
 
   RESTTableOperations(
       RESTClient client,
@@ -289,9 +290,18 @@ class RESTTableOperations implements TableOperations {
     // LoadTableResponse is used to deserialize the response, but config is not allowed by the REST
     // spec so it can be
     // safely ignored. there is no requirement to update config on refresh or commit.
-    if (current == null
-        || !Objects.equals(current.metadataFileLocation(), response.metadataLocation())) {
+    boolean sameRevision =
+        currentRevision != null
+            && response.metadataRevision() != null
+            && Objects.equals(currentRevision, response.metadataRevision());
+    boolean sameMetadataLocation =
+        currentRevision == null
+            && response.metadataRevision() == null
+            && current != null
+            && Objects.equals(current.metadataFileLocation(), response.metadataLocation());
+    if (!sameRevision && !sameMetadataLocation) {
       this.current = checkUUID(current, response.tableMetadata());
+      this.currentRevision = response.metadataRevision();
     }
 
     return current;

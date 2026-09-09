@@ -377,6 +377,11 @@ environment.
 
 ## Initial repository work
 
+Implementation status: the REST load response now has an optional opaque metadata revision. REST
+table operations use it as the freshness identity when supplied and retain metadata-location
+comparison as the backward-compatible fallback. The row-backed catalog and revision-based commit
+requirement remain future work.
+
 The first implementation change should be a narrow, test-only prototype rather than a new public
 SPI. It should:
 

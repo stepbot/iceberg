@@ -73,7 +73,7 @@ public class TestLoadTableResponse extends RequestResponseTestBase<LoadTableResp
 
   @Override
   public String[] allFieldsFromSpec() {
-    return new String[] {"metadata-location", "metadata", "config"};
+    return new String[] {"metadata-location", "metadata-revision", "metadata", "config"};
   }
 
   @Override
@@ -86,7 +86,11 @@ public class TestLoadTableResponse extends RequestResponseTestBase<LoadTableResp
             .withMetadataLocation(TEST_METADATA_LOCATION)
             .build();
 
-    return LoadTableResponse.builder().withTableMetadata(metadata).addAllConfig(CONFIG).build();
+    return LoadTableResponse.builder()
+        .withTableMetadata(metadata)
+        .withMetadataRevision("revision-7")
+        .addAllConfig(CONFIG)
+        .build();
   }
 
   @Override
@@ -187,6 +191,9 @@ public class TestLoadTableResponse extends RequestResponseTestBase<LoadTableResp
     assertThat(actual.metadataLocation())
         .as("Should have the same metadata location")
         .isEqualTo(expected.metadataLocation());
+    assertThat(actual.metadataRevision())
+        .as("Should have the same metadata revision")
+        .isEqualTo(expected.metadataRevision());
   }
 
   private void assertEqualTableMetadata(TableMetadata actual, TableMetadata expected) {

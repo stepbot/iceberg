@@ -32,6 +32,7 @@ import org.apache.iceberg.util.JsonUtil;
 public class LoadTableResponseParser {
 
   private static final String METADATA_LOCATION = "metadata-location";
+  private static final String METADATA_REVISION = "metadata-revision";
   private static final String METADATA = "metadata";
   private static final String CONFIG = "config";
   private static final String STORAGE_CREDENTIALS = "storage-credentials";
@@ -54,6 +55,10 @@ public class LoadTableResponseParser {
 
     if (null != response.metadataLocation()) {
       gen.writeStringField(METADATA_LOCATION, response.metadataLocation());
+    }
+
+    if (null != response.metadataRevision()) {
+      gen.writeStringField(METADATA_REVISION, response.metadataRevision());
     }
 
     gen.writeFieldName(METADATA);
@@ -99,6 +104,10 @@ public class LoadTableResponseParser {
     }
 
     LoadTableResponse.Builder builder = LoadTableResponse.builder().withTableMetadata(metadata);
+
+    if (json.hasNonNull(METADATA_REVISION)) {
+      builder.withMetadataRevision(JsonUtil.getString(METADATA_REVISION, json));
+    }
 
     if (json.hasNonNull(CONFIG)) {
       builder.addAllConfig(JsonUtil.getStringMap(CONFIG, json));

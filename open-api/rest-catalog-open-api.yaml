@@ -4176,7 +4176,7 @@ components:
 
 
         The table metadata JSON is returned in the `metadata` field. The corresponding file location of table metadata should be returned in the `metadata-location` field, unless the metadata is not yet committed. For example, a create transaction may return metadata that is staged but not committed.
-        Clients can check whether metadata has changed by comparing metadata locations after the table has been created.
+        Clients can check whether metadata has changed by comparing metadata revisions when present, or metadata locations otherwise. A metadata revision is an opaque identifier and may be returned for committed metadata that has no metadata file location.
 
 
         The `config` map returns table-specific configuration for the table's resources, including its HTTP client and FileIO. For example, config may contain a specific FileIO implementation class for the table depending on its underlying storage.
@@ -4226,6 +4226,9 @@ components:
           type: string
           description: May be null if the table is staged as part of a transaction
           nullable: true
+        metadata-revision:
+          type: string
+          description: Opaque identifier for the committed table metadata revision
         metadata:
           $ref: '#/components/schemas/TableMetadata'
         config:
